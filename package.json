@@ -24,7 +24,6 @@
     "express": "latest",
     "express-handlebars": "latest",
     "fs": "latest",
-
     "pg": "^8.8.0"
   },
   "devDependencies": {

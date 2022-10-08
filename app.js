@@ -1,51 +1,70 @@
-// Serveur Express - NodeJS
-const express = require('express')
-const app = express()
-const pg = require('pg')
-const exphbs = require('express-handlebars')
-const fs = require('fs')
-const readFileSync = require('fs').readFileSync
-// On charge lke fichier // env/express_config.env
-const env = require('dotenv').config({path: './env/express_config.env'})
-const port = process.env.devPORT
-// On a besoin de la base de donnée PostgreSQL
-const { Pool } = require('pg')
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: true
-})
-// // On utilise le https
-// const https = require('https')
-// // On démarre le serveur en https
-// https.createServer({
-//     key: fs.readFileSync('key.pem'),
-//     cert: fs.readFileSync('cert.pem')
-// }, app).listen(port, () => {
-//     console.log(`Serveur démarré sur le port ${port}`)
-// })
+// ---( Serveur Express - NodeJS )---
+// Les modules
+    const express = require('express')
+    const app = express()
+    const pg = require('pg')
+    const port = process.env.devPORT
+    //  Connexion à la base de données
+    const exphbs = require('express-handlebars')
+    const fs = require('fs')
+    const readFileSync = require('fs').readFileSync
+    // On charge le fichier de config Express 
+    const env = require('dotenv').config({path: './env/express_config.env'})
+    // On charge le fichier de config de la base de données
+    const db = require('dotenv').config({path: './env/db_config.env'})
+    // On a besoin de la base de donnée PostgreSQL
+    const { Client } = require('pg')
+    const client = new Client({
+        user: process.env.dbUSER,
+        host: process.env.dbHOST,
+        database: process.env.dbDATABASE,
+        password: process.env.dbPASSWORD,
+        port: process.env.dbPORT,
+    })
+// --- Fin des modules ---
 
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+// ---( PostgresSQL - Connexion )---
+    // On se connecte à la base de données
+    client.connect()
+    // Si la connexion échoue, on affiche l'erreur sinon on affiche un message de succès
+    client.on('error', (err) => {
+        console.log('Erreur de connexion à la base de données', err)
+    })
+    client.on('connect', () => {
+        console.log('Connexion à la base de données réussie')
+    })
+    // On envoie une requête à la base de données
+    client.query('SELECT NOW()', (err, res) => {
+        console.log(err, res)
+        client.end()
+    })
+// --- Fin de la connexion ---
 
-app.listen(port, () => {
-  console.log(`le serveur tourne sur le port ${port}`)
-})
- // --------------------------------------------------
- // When the server is started we start the localtunnel service
- const localtunnel = require('localtunnel')
 
-// and print the public URL to the console with the subdomain from the .env file
+// ---( Express - Configuration )---
+    app.get('/', (req, res) => {
+        res.send('Hello World!')
+        })
+    app.listen(port, () => {
+    console.log(`le serveur tourne sur le port ${port}`)
+    })
+// --- Fin de la configuration ---
 
-const tunnel = localtunnel({ port: process.env.devPORT, subdomain: process.env.devSUBDOMAIN }, (err, tunnel) => {
-        // subdomain
-  
-        if (err) {
-            console.error(err)
-            process.exit(1)
+
+// ---( Lancement du serveur localtunnel)---
+    // When the server is started we start the localtunnel service
+    const localtunnel = require('localtunnel')
+    // and print the public URL to the console with the subdomain from the .env file
+    const tunnel = localtunnel({ port: process.env.devPORT, subdomain: process.env.devSUBDOMAIN }, (err, tunnel) => {
+            // subdomain
+    
+            if (err) {
+                console.error(err)
+                process.exit(1)
+            }
+
+            console.log(`Tunnel URL: ${tunnel.url}`)
         }
-
-        console.log(`Tunnel URL: ${tunnel.url}`)
-    }
-)
+    )
+// --- Fin du lancement ---
