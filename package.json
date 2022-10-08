@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js port=3000",
-    "start": "node app.js port=8080",
-    "lt start" : "lt --port 80 --subdomain dev"
+    "dev": "nodemon app.js port=3000 ",
+    "start": "node app.js port=8080 && pm2 lt --port 8080 --bnema",
+    "lt": "lt --port 3000 --subdomain bnema"
   },
   "repository": {
     "type": "git",
@@ -22,15 +22,18 @@
     "discord.js": "latest",
     "discord.js-poll": "latest",
     "express": "latest",
+    "express-handlebars": "latest",
     "fs": "latest",
-    "pg": "latest"
+
+    "pg": "^8.8.0"
   },
   "devDependencies": {
+    "dotenv": "^16.0.2",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.3",
-    "nodemon": "^2.0.20",
-    "dotenv": "^16.0.2"
+    "localtunnel": "latest",
+    "nodemon": "^2.0.20"
   },
   "engines": {
     "node": "latest"
