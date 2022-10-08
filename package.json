@@ -1,0 +1,38 @@
+{
+  "name": "login_postgresql",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js port=3000",
+    "start": "node app.js port=8080",
+    "lt start" : "lt --port 80 --subdomain dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bnema/login_nodejs_postgresql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bnema/login_nodejs_postgresql/issues"
+  },
+  "homepage": "https://github.com/bnema/login_nodejs_postgresql#readme",
+  "dependencies": {
+    "@discordjs/rest": "latest",
+    "discord.js": "latest",
+    "discord.js-poll": "latest",
+    "express": "latest",
+    "fs": "latest",
+    "pg": "latest"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.3",
+    "nodemon": "^2.0.20",
+    "dotenv": "^16.0.2"
+  },
+  "engines": {
+    "node": "latest"
+  }
+}
