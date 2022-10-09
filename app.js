@@ -30,12 +30,12 @@
 // --- End of modules ---
 
 // ---( Express - Configuration )---
-// We connect to the database first and then start the server + tunnel
+// We try connect to the database first and then start the server + tunnel
     client.connect()
     .then(() => {
         console.log(`Connected to the database \x1b[33m${process.env.DB_NAME}\x1b[0m with the user\x1b[33m ${process.env.DB_USER}\x1b[0m`)
+        client.end()
     })
-
     // Then we start the server
     app.listen(PORT, () => {
         console.log(`Server is running on port \x1b[33m${PORT}\x1b[0m`)
@@ -48,7 +48,7 @@
     const subdomainsList = process.env.subdomainsList.split(',')
     // Log all the subdomains in the console
     console.log(subdomainsList)
-    
+
     // Try all the subdomains in the array until one is available
     subdomainsList.forEach(subdomain => {
         localtunnel(PORT, { subdomain: subdomain }, (err, tunnel) => {
