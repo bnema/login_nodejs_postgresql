@@ -14,6 +14,7 @@
     const readFileSync = require('fs').readFileSync
     // Local database-requests module
     const db = require('./src/modules/database')
+    const client = db.client
 // --- End of global modules ---
 // --- Local modules import ---
     // Localtunnel
@@ -22,11 +23,6 @@
     // Discord bot
     const discordBot= require('./src/modules/discord')
     const clientBot = discordBot.clientBot
-    
-    // GetChannels
-    // Database
-    const db = require('./src/modules/database')
-    const client = db.client
 
 // --- End of local modules ---
 

@@ -1,3 +1,7 @@
+// Module name: database
+// Language: javascript
+// Path: src\modules\database.js
+
 const pg = require('pg')
 // --- Database connection ---
      // PostgreSQ connection
@@ -12,4 +16,6 @@ const pg = require('pg')
     })
 // --- End of database connection ---
 
-module.exports = { client }
+module.exports = { 
+    client : client
+ }

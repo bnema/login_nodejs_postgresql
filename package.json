@@ -27,7 +27,9 @@
     "express": "latest",
     "express-handlebars": "latest",
     "fs": "latest",
-    "pg": "^8.8.0"
+    "pg": "^8.8.0",
+    "database": "./src/models/database.js",
+    "DiscordBot": "./src/module/discord.js"
   },
   "devDependencies": {
     "dotenv": "^16.0.2",
