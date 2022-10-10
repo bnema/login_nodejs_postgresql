@@ -12,6 +12,8 @@
     const Discord = require('discord.js');
     const { Client, GatewayIntentBits, Webhook, } = require('discord.js');
     const readFileSync = require('fs').readFileSync
+    // Local database-requests module
+    const db = require('./src/modules/database')
 // --- End of global modules ---
 // --- Local modules import ---
     // Localtunnel

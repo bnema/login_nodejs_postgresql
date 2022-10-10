@@ -2,7 +2,8 @@ require('dotenv').config({ path: 'config.env' })
 const { GatewayIntentBits, PermissionFlagsBits, Client, Permissions, EmbedBuilder } = require('discord.js');
 const Discord = require('discord.js');
 const { poll } = require('discord.js-qotd');
-
+const db = require('./src/modules/database')
+const client = db.client
 module.exports = {
 	name: 'qotd',
 	description: 'Create a qeustion of the day embed.',
@@ -23,7 +24,17 @@ const clientBot = new Discord.Client({
     ],
     permissions: [
         PermissionFlagsBits.Administrator
-    ]
+    ],
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+    presence: {
+        status: 'online',
+        activities: [
+            {
+                name: 'with the code',
+                type: 'PLAYING'
+            }
+        ]
+    }
 })
 const AntiSpam = require("discord-anti-spam");
 const antiSpam = new AntiSpam({
@@ -42,8 +53,6 @@ const antiSpam = new AntiSpam({
 
 clientBot.on('ready', () => {
     console.log(`Logged in as \x1b[33m${clientBot.user.tag}\x1b[0m`)
-        // Set activity to "Playing with JavaScript"
-    clientBot.user.setActivity('with JavaScript', { type: 'PLAYING' })
     // List all users connected to the bot
     clientBot.guilds.cache.forEach((guild) => {
         console.log(guild.name)
@@ -56,6 +65,9 @@ clientBot.on('ready', () => {
 
 clientBot.on('messageCreate', message => {
     console.log('Message received! Message content: ' + message.content);
+    // Use the variable membersString from the module discord.js
+    const { membersString } = require('./src/modules/discord.js')
+    console.log(membersString)
    // Ignore messages from other bots
    // Check if the user is spamming else ignore
     if (message.author.bot) return;
@@ -72,6 +84,11 @@ clientBot.on('messageCreate', message => {
         // We reply "@user : the message"
         message.reply(`Tu me donnes envie de vomir avec ton ${message.content}, espèce de merde !`);
     };
+    if (message.content === '!whoami') {
+        message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
+        // Send the message content
+        message.channel.send(`Your message: ${message.content}`);
+    }
     if (message.content === '!gmdj') {
         const poll = new Discord.EmbedBuilder()
         .setDescription(`Alors qui mérite d'être la grosse merde du jour?`)
@@ -83,6 +100,7 @@ clientBot.on('messageCreate', message => {
     }
     // When a user send the message "!poll" we create a question of the day
 })
+
 // Client login  
 clientBot.login(process.env.discordBotToken)
 
