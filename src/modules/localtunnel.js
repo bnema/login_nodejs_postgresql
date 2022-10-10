@@ -18,22 +18,16 @@ function loadSubdomains() {
         const tunnelUrl = tunnel.url
         console.log(`The tunnel is available at \x1b[33m${tunnelUrl}\x1b[0m`)
         })
+
     })
 }
- // Console log the result of the function
-
-// We try the function
-loadSubdomains()
-console.log(loadSubdomains())
-
-
-    // We create the tunnel with the random subdomain
+// We create the tunnel with the random subdomain
     const tunnel = localtunnel(PORT, { subdomain: 'bnema' }, (err, tunnel) => {
         console.log(`Tunnel url is: \x1b[33m${tunnel.url}\x1b[0m`)
         if (err) {
             console.log('Error while creating the tunnel', err)
         }
-    })
+})
 
 
    // Export the const tunnel

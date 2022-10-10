@@ -3,12 +3,14 @@
     const express = require('express')
     // We load our environment variables from the config.env file
     require('dotenv').config({ path: 'config.env' })
-    const app = express()
+    // We load our modules from the config.env file
+   const app = express()
     const PORT = process.env.devPORT
     const pg = require('pg')
     const exphbs = require('express-handlebars')
     const fs = require('fs')
-    const { DiscordAPIError } = require('discord.js')
+    const Discord = require('discord.js');
+    const { Client, GatewayIntentBits, Webhook, } = require('discord.js');
     const readFileSync = require('fs').readFileSync
 // --- End of global modules ---
 // --- Local modules import ---
@@ -16,8 +18,10 @@
     const localtunnel = require('./src/modules/localtunnel')
     const tunnel = localtunnel.tunnel
     // Discord bot
-    // const Discord = require('./src/modules/discord')
-    // const discordBot = Discord.client
+    const discordBot= require('./src/modules/discord')
+    const clientBot = discordBot.clientBot
+    
+    // GetChannels
     // Database
     const db = require('./src/modules/database')
     const client = db.client
