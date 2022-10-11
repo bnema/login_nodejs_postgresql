@@ -19,17 +19,20 @@
   "homepage": "https://github.com/bnema/login_nodejs_postgresql#readme",
   "dependencies": {
     "@discordjs/rest": "latest",
+    "cron": "^2.1.0",
+    "database": "./src/models/database.js",
+    "date": "^2.0.1",
     "discord-anti-spam": "^2.8.1",
     "discord-polls": "^1.1.1",
     "discord.js": "latest",
     "discord.js-poll": "latest",
     "discord.js-qotd": "^1.5.1",
+    "DiscordBot": "./src/module/discord.js",
     "express": "latest",
     "express-handlebars": "latest",
     "fs": "latest",
-    "pg": "^8.8.0",
-    "database": "./src/models/database.js",
-    "DiscordBot": "./src/module/discord.js"
+    "node-cron": "^3.0.2",
+    "pg": "^8.8.0"
   },
   "devDependencies": {
     "dotenv": "^16.0.2",

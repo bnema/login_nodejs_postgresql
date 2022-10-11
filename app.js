@@ -19,10 +19,15 @@
     const query = db.query
 // --- End of global modules ---
 // --- Local modules import ---
-    // Localtunnel
-    const localtunnel = require('./src/modules/localtunnel')
-    const tunnel = localtunnel.tunnel
-    // Discord bot
+    // // Localtunnel
+    // const localtunnel = require('./src/modules/localtunnel')
+    // // We start the tunnel, if there an arror we log it but we don't stop the server
+    // localtunnel.on('error', err => {
+    //     console.log('Error while creating the tunnel', err)
+    // })
+
+    // const tunnel = localtunnel.tunnel
+
     const discordBot= require('./src/modules/discord')
     const clientBot = discordBot.clientBot
 
@@ -59,7 +64,7 @@
     process.on('SIGINT', () => {
         // We close the tunnel
         console.log(' ')
-        tunnel.close()
+        // tunnel.close()
         console.log('Tunnel closed')
         console.log('SIGINT signal received: closing HTTP server')
         // We close the tunnel
