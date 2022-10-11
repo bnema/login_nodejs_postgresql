@@ -14,8 +14,28 @@ const pg = require('pg')
         // String on one line to avoid errors
         string: process.env.DATABASE_URL // UNDEFINED !!
     })
+
+    const connect = () => {
+        client.connect()
+        .then(() => {
+            console.log(`Connected to the database \x1b[33m${process.env.DB_NAME}\x1b[0m with the user\x1b[33m ${process.env.DB_USER}\x1b[0m`)
+            // If there is an error we log it
+            client.on('error', err => {
+                console.log(`Error while connecting to the database`,err)
+            })
+        })
+    }
+    const query = (text, params) => {
+        return client.query(text, params)
+    }
+    const end = () => {
+        client.end()
+    }
 // --- End of database connection ---
 
 module.exports = { 
-    client : client
+    client : client,
+    connect : connect,
+    query : query,
+    end : end
  }

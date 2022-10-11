@@ -15,6 +15,8 @@
     // Local database-requests module
     const db = require('./src/modules/database')
     const client = db.client
+    const connect = db.connect
+    const query = db.query
 // --- End of global modules ---
 // --- Local modules import ---
     // Localtunnel
@@ -44,7 +46,6 @@
         client.on('error', err => {
             console.log(`Error while connecting to the database`,err)
         })
-        client.end()
     }) 
     // Then we start the server
     app.listen(PORT, () => {

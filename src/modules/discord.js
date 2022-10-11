@@ -5,8 +5,11 @@ const { poll } = require('discord.js-qotd');
 // Load module database
 const db = require('./database')
 const client = db.client
-const dbRequest = require('./database-requests')
-const members = dbRequest.members
+const connect = db.connect
+const query = db.query
+const end = async () => {
+    await client.end()
+}
 
 module.exports = {
 	name: 'qotd',
@@ -30,54 +33,62 @@ const clientBot = new Discord.Client({
         PermissionFlagsBits.Administrator
     ]
 })
-const AntiSpam = require("discord-anti-spam");
-const antiSpam = new AntiSpam({
-    warnThreshold: 3, // Amount of messages sent in a row that will cause a warning.
-    muteTreshold: 6, // Amount of messages sent in a row that will cause a mute.
-    kickTreshold: 90, // Amount of messages sent in a row that will cause a kick.
-    banTreshold: 120, // Amount of messages sent in a row that will cause a ban.
-    warnMessage: "Stop spamming!", // Message sent in the channel when a user is warned.
-    muteMessage: "You have been muted for spamming!", // Message sent in the channel when a user is muted.
-    kickMessage: "You have been kicked for spamming!", // Message sent in the channel when a user is kicked.
-    banMessage: "You have been banned for spamming!", // Message sent in the channel when a user is banned.
-    unMuteTime: 60, // Time in minutes before the user will be able to send messages again.
-    verbose: true, // Whether or not to log every action in the console.
-    removeMessages: true, // Whether or not to remove all messages sent by the user. // For more options, see the documentation:
-  });
+  let totalMembers
+  let membersName
+  let membersID
 
 clientBot.on('ready', () => {
     console.log(`DiscordBot logged in as \x1b[33m${clientBot.user.tag}\x1b[0m`)
         // Find the guild ID that contain the name "On adore jouer  
-const guild = clientBot.guilds.cache.find(guild => guild.name === "On adore jouer");
-// Console log the guild ID
-const guildID = guild.id
-// Fetch all members of guildID
-guild.members.fetch().then(fetchedMembers => {
-const totalMembers = fetchedMembers.size;
-const membersName = fetchedMembers.map(member => member.user.username);
-console.log(membersName);
+    const guild = clientBot.guilds.cache.find(guild => guild.name === "On adore jouer");
+    // Console log the guild ID
+    const guildID = guild.id
+    // Fetch all members of guildID
+    guild.members.fetch().then(fetchedMembers => {
+        totalMembers = fetchedMembers.size;
+        membersName = fetchedMembers.map(member => member.user.username);
+        membersID = fetchedMembers.map(member => member.user.id);
+        // In the database we create a table called members
+        query(`CREATE TABLE IF NOT EXISTS members (id SERIAL PRIMARY KEY, memberID VARCHAR(255), memberName VARCHAR(255), poopDaily INTEGER, poopMonthly INTEGER, poopYearly INTEGER, poopOverall INTEGER)`, (err, res) => {
+            // If successful we console log the table
+            if (err) {
+                console.log(err.stack)
+            } else {
+        // We loop through the membersName array
+        for (let i = 0; i < membersName.length; i++) {
+            // We check if the memberName is already in the database
+            query(`SELECT * FROM members WHERE memberName = '${membersName[i]}'`, (err, res) => {
+                if (err) {
+                    console.log(err.stack)
+                }
+                // If the memberName is not in the database we add it
+                if (res.rows.length === 0) {
+                    query(`INSERT INTO members (memberID, memberName, poopDaily, poopMonthly, poopYearly, poopOverall) VALUES ('${membersID[i]}', '${membersName[i]}', 0, 0, 0, 0)`, (err, res) => {
+                    if (err) {
+                            console.log(err.stack)
+                        }
+                        })
+                    }
+                })
+                }
+                }
+        }),
+        // We consol log the table members
+        query(`SELECT * FROM members`, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+            } else {
+                console.table(res.rows)
+            }
+        })
+        })
 });
-
-})
-
+// COnsole log the message
 clientBot.on('messageCreate', message => {
     console.log(message.author.username + ' say: ' + message.content);
-    // List all users in the guild "On adore jouer"
      // Ignore messages from other bots
     if (message.author.bot) return;
-    antiSpam.message(message);
 
-   if (message.author.bot) return;
-    // If the message is "ping"
-    // if (message.content === 'coucou les amis') {
-    //     // We reply "@user : the message"
-    //     message.reply(`Tu me donnes envie de vomir avec ton ${message.content}, espèce de merde !`);
-    // };
-    // // If message content contains "mdr" or "lol" or "haha"
-    // if (message.content.includes('mdr') || message.content.includes('lol') || message.content.includes('haha')) {
-    //     // We reply "@user : the message"
-    //     message.reply(`Tu me donnes envie de vomir avec ton ${message.content}, espèce de merde !`);
-    // };
     if (message.content === '!whoami') {
         message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
         // Send the message content
@@ -92,46 +103,71 @@ clientBot.on('messageCreate', message => {
             messageReaction.react('👎');
         });
     }
-    function poopCounter() {
-        
-        clientBot.on('messageReactionAdd', (reaction, user, message) => {
-            
-           // If this is the bot's reaction, ignore it
-              if (user.bot) return;
-            // We create an empty array with "users" "count" and "emoji"
-            const channel = reaction.message.channel;// channel = current channel
-            // Create a variable for the user who created the message
-            const userPooped = reaction.message.author.username;
-           // If the reaction is poop emoji and the user is not a bot we add the user to the array and add 1 to the counter
-            if (reaction.emoji.name === poopCounter.emoji && !user.bot) {
-                // Crean an array with 3 values
-                const poopCounter= [reaction.message.author.username, 1, poopCounter.emoji];
-                console.log(poopCounter)
-                poopCounter.users.push(reaction.message.author.username);
-                // Console log who got added to the array
-                console.log(`${userPooped} got added to the array`)
-                poopCounter.count++;
-                // Console log the counter of the userPooped
-                console.log(`${userPooped} got ${poopCounter.count} poop`)
-                // Add the user to the array
-                // Add 1 to the counter
-                // Send a message in the channel
-                channel.send(`${userPooped} a chié ${poopCounter.count}`);
-                // For each user who add a poop emoji we add +1 to the counter of reaction.message.author.username
+    });
+// function async poopCounter
+async function poopCounter() {
+// Listen to reaction :poop:
+clientBot.on('messageReactionAdd', async (reaction, user, message) => {
+    PoopedUser = reaction.message.author.username
+    PoopedID = reaction.message.author.id
+    channel = reaction.message.channel
 
-            // If a poop is removed we remove 1 to the counter
-            if (reaction.emoji.name === poopCounter.emoji && !user.bot) {
-                poopCounter.count--;
-                // Console log the user who reacted and the counter
-                console.log(`${userPooped} compteur: ${poopCounter.count}`);
-    // End
+    if (reaction.emoji.name === '💩') {
+        // Console log who got pooped
+        console.log(PoopedUser + ' got pooped')
+        // We check if the memberName is already in the database
+        query(`SELECT * FROM members WHERE memberName = '${PoopedUser}'`, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+            }          
             }
-        }
-    })
-}
-            
-    poopCounter()
+        )
+        // We add 1 to the poopDaily poopMonthly poopYearly poopOverall
+        query(`UPDATE members SET poopDaily = poopDaily + 1, poopMonthly = poopMonthly + 1, poopYearly = poopYearly + 1, poopOverall = poopOverall + 1 WHERE memberid = '${PoopedID}'`, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+            } else {
+                // Console log the row of the memberName
+                query(`SELECT * FROM members WHERE memberName = '${PoopedUser}'`, (err, res) => {
+                    if (err) {
+                        console.log(err.stack)
+                    } else {
+                        console.table(res.rows)
+                        // Send the poopDaily poopMonthly poopYearly poopOverall from the user
+                        poopDaily = res.rows[0].poopdaily
+                        poopMonthly = res.rows[0].poopmonthly
+                        poopYearly = res.rows[0].poopyearly
+                        poopOverall = res.rows[0].poopoverall
+                        // We send a message in the channel
+                        console.log(`${PoopedUser} a été une merde  ${poopDaily} fois aujourd'hui, ${poopMonthly} fois ce mois-ci, ${poopYearly} fois cette année et ${poopOverall} fois au total`)
+                        
+                    }
+                })
+            }
+        })
+    }
 })
+}
+// If the user remove his reaction :poop: we remove 1 to the poopDaily poopMonthly poopYearly poopOverall
+async function poopCounterRemove() {
+clientBot.on('messageReactionRemove', async (reaction, user, message) => {
+    PoopedUser = reaction.message.author.username
+    PoopedID = reaction.message.author.id
+    channel = reaction.message.channel
+    if (reaction.emoji.name === '💩') {
+        query(`UPDATE members SET poopDaily = poopDaily - 1, poopMonthly = poopMonthly - 1, poopYearly = poopYearly - 1, poopOverall = poopOverall - 1 WHERE memberid = '${PoopedID}'`, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+            } else {
+                channel.send(`${PoopedUser} a été dépoopé par ${user.username}`)
+            }
+    })
+}})
+}
+
+// We call the function poopCounter and poopCounterRemove that depend on it to work
+poopCounter()
+poopCounterRemove()
 
 
 // Client login  
