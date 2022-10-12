@@ -63,7 +63,7 @@ clientBot.on('ready', () => {
                 }
                 // If the memberName is not in the database we add it
                 if (res.rows.length === 0) {
-                    query(`INSERT INTO members (memberID, memberName, poopDaily, poopMonthly, poopYearly, poopOverall gmdj_selected) VALUES ('${membersID[i]}', '${membersName[i]}', 0, 0, 0, 0, 0)`, (err, res) => {
+                    query(`INSERT INTO members (memberID, memberName, poopDaily, poopMonthly, poopYearly, poopOverall, gmdj_selected) VALUES ('${membersID[i]}', '${membersName[i]}', 0, 0, 0, 0, 0)`, (err, res) => {
                     if (err) {
                             console.log(err.stack)
                         }
