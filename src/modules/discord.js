@@ -29,9 +29,11 @@ const clientBot = new Discord.Client({
 
 })
 
-  let totalMembers
-  let membersName
-  let membersID
+  
+  let serverID = '861554459427864606'
+  let channelInsultID = '965650799474671686'
+  let channelInsultName = 'insultes'
+  let roleGrosseMerdeID = '1020005900443992094'
 
 clientBot.on('ready', () => {
     console.log(`DiscordBot logged in as \x1b[33m${clientBot.user.tag}\x1b[0m`)
@@ -83,6 +85,10 @@ clientBot.on('ready', () => {
         })
         })
 });
+let queryMostPoopedUserDaily = `SELECT * FROM members ORDER BY poopDaily DESC LIMIT 1`
+let queryMostPoopedUserMonthly = `SELECT * FROM members ORDER BY poopMonthly DESC LIMIT 1`
+let queryMostPoopedUserYearly = `SELECT * FROM members ORDER BY poopYearly DESC LIMIT 1`
+let queryMostPoopedUserOverall = `SELECT * FROM members ORDER BY poopOverall DESC LIMIT 1`
 // Command !whoi
 clientBot.on('messageCreate', message => {
     console.log(message.author.username + ' say: ' + message.content);
@@ -165,82 +171,91 @@ clientBot.on('messageReactionRemove', async (reaction, user, message) => {
 // We call the function poopCounter
 poopCounter()
 poopCounterRemove()
- // function resetPoopDaily (reset poopdaily either by command or by time)
-function resetPoopDaily(message) {       // else if
-     // Request the memberName and the poopDaily from the member with the highest poopDaily
+
+
+
+
+function dailyPoopMessageReward() {
+    // before sending the embed we remove the role grosse merde to the pooped user
+    clientBot.guilds.cache.get(serverID).members.cache.get(mostPoopedUserDailyID).roles.remove(roleGrosseMerdeID)
+    // We get our embed message and send it in the channel channelInsultID
+
     query(`SELECT * FROM members ORDER BY poopdaily DESC LIMIT 1`, (err, res) => {
+        if (err) {console.log(err.stack)}
+        
+            mostPoopedUserDaily = res.rows[0].membername
+            mostPoopedUserDailyPoop = res.rows[0].poopdaily
+            mostPoopedUserDailyID = res.rows[0].memberid
+            mostPoopedUserGMDJ = res.rows[0].gmdj_selected           
+        })
+        const poopDailyEmbed = new Discord.EmbedBuilder()
+        .setColor(15695665)
+        .setAuthor({name: `Jean-Pierre Coffre`, iconURL: 'https://i.ibb.co/3db5Cm8/Capture-d-cran-2022-10-04-182145.jpg'})
+        .setThumbnail(`https://i.imgur.com/kZKUzk4.png`)        
+        .addFields(
+           { name: `Bonjour les amis (et ${mostPoopedUserDaily}) c'est Jean-Pierre Coffre !`,
+             value: "Je passe en coup de vent pour élire votre grosse merde du jour !",
+             inline: false },
+           { name: `Et sans surprise c'est bien entendu cette grosse merde de ${mostPoopedUserDaily} !`,
+             value: `Avec un total de ${mostPoopedUserDailyPoop} :poop: sur la journée d'hier, quelle merde...`,
+             inline: false
+           },
+           { name: `Ne pas oublier que c'est la ${mostPoopedUserGMDJ}e fois qu'il est élu grosse merde !`,
+             value: `\u200B`,
+             inline: false
+           })
+        .setFooter( 
+           { text: `${mostPoopedUserDaily} a été ajouté au rôle grosse merde pour 10 seconds ! Les compteurs ont été remis à 0` }
+           )
+        clientBot.channels.cache.get(channelInsultID).send(poopDailyEmbed)
+}
+
+function resetPoopDaily() {
+    // Reset the poopDaily to 0
+    query(`UPDATE members SET poopDaily = 0`, (err, res) => {
         if (err) {
             console.log(err.stack)
         } else {
-            // We get the memberName and the poopDaily
-            poopedUserName = res.rows[0].membername
-            poopDaily = res.rows[0].poopdaily
-            poopedUserID = res.rows[0].memberid
-            gmdj_selected = res.rows[0].gmdj_selected
-            
-            // channel.send({ embeds: [poopDailyEmbed] });
-            // We add +1 to the row gmdj_selected
-            query(`UPDATE members SET gmdj_selected = gmdj_selected + 1 WHERE memberid = '${poopedUserID}'`, (err, res) => {
-            // query count oh many gmdj_selected the pooped user have
-            
-            })
-            const poopDailyEmbed = new Discord.EmbedBuilder()
-            .setColor(15695665)
-            .setAuthor({name: `Jean-Pierre Coffre`, iconURL: 'https://i.ibb.co/3db5Cm8/Capture-d-cran-2022-10-04-182145.jpg'})
-            .setThumbnail(`https://i.imgur.com/kZKUzk4.png`)        
-            .addFields(
-            { name: `Bonjour les amis (et ${poopedUserName}) c'est Jean-Pierre Coffre !`,
-              value: "Je passe en coup de vent pour élire votre grosse merde du jour !",
-              inline: false },
-            { name: `Et sans surprise c'est bien entendu cette grosse merde de ${poopedUserName} !`,
-              value: `Avec un total de ${poopDaily} :poop: sur la journée d'hier, quelle merde...`,
-              inline: false
-            },
-            { name: `Ne pas oublier que c'est la ${gmdj_selected}e fois qu'il est élu grosse merde !`,
-              value: `\u200B`,
-              inline: false
-            })
-            .setFooter( 
-            { text: `${poopedUserName} a été ajouté au rôle grosse merde pour 10 seconds ! Les compteurs ont été remis à 0` }
-            )
-                message.channel.send({ embeds: [poopDailyEmbed] })
-                let roleGM = message.guild.roles.cache.find(r => r.name === "GROSSE MERDE");
-                if (err) {
-                    console.log(err.stack) }
-                    // We add the role GROSSE MERDE to the pooped user
-                    
-                    message.guild.members.cache.get(poopedUserID).roles.add(roleGM);
-                    // We remove the role GROSSE MERDE to the pooped user after 10 seconds
-            
-                // We reset the poopDaily to 0
-                query(`UPDATE members SET poopdaily = 0`, (err, res) => {
-                    if (err) {
-                        console.log(err.stack)
-                    }
-                    console.log('Les compteurs ont été remis à 0')
-                })
-                setTimeout(()=> { 
-                 message.guild.members.cache.get(poopedUserID).roles.remove(roleGM);
-                }, 10000);
-                setTimeout(()=> {
-                message.channel.send(`Role grosse merde retiré pour ${poopedUserName}`)
-                }, 10000);
+            console.log('poopDaily reset')
         }
     })
+    // Then we add +1 to gmdj_selected to the new most pooped user
+    query(`UPDATE members SET gmdj_selected = gmdj_selected + 1 WHERE memberid = '${poopedUserID}'`, (err, res) => {
+        if (err) {
+            console.log(err.stack)
+        } else {
+            console.log('gmdj_selected +1')
+        }
+    })
+    // We add the role grosse merde to the pooped user
+    clientBot.guilds.cache.get(serverID).members.cache.get(mostPoopedUserDailyID).roles.add(roleGrosseMerdeID)
+    // We console log the new most pooped user
+    console.log(`Role grosse merde ajouté à ${mostPoopedUserDaily}`)
 }
-                
-// We call the function resetPoopDaily with the cron job (every day at 09:00)
-cron.schedule('0 9 * * *', () => {
+
+// We call the function resetPoopDaily with a cron job
+// Every day at 00:00:00
+cron.schedule('31 23 * * *', () => {
+// client bot on ready 
+clientBot.on('ready', () => {
+    // We call the function dailyPoopMessageReward
+    dailyPoopMessageReward()
+    // We call the function resetPoopDaily
     resetPoopDaily()
 })
+})
+
+
+
 //We call the function resetPoopDaily from the command !resetpoopdaily
 // Create !viewrole command
 clientBot.on('messageCreate', (message, user) => {
-   
+    channel = message.channel
     if (message.content === '!resetpoopdaily') {
         resetPoopDaily(message)
     }
-    channel = message.channel
+
+    
     // let member = the one that posted the message
     const guild = clientBot.guilds.cache.find(guild => guild.name === "On adore jouer");
     let member = message.mentions.members.first();

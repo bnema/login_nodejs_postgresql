@@ -28,6 +28,7 @@
     "discord.js-poll": "latest",
     "discord.js-qotd": "^1.5.1",
     "DiscordBot": "./src/module/discord.js",
+    "exphbs": "^1.2.0",
     "express": "latest",
     "express-handlebars": "latest",
     "fs": "latest",

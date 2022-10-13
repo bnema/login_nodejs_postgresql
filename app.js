@@ -14,11 +14,11 @@
     const readFileSync = require('fs').readFileSync
     // Local database-requests module
     const db = require('./src/modules/database')
-    const client = db.client
     const connect = db.connect
     const query = db.query
 // --- End of global modules ---
-// --- Local modules import ---
+// --- Local modules import --- //////// Not useful disabled
+
     // // Localtunnel
     // const localtunnel = require('./src/modules/localtunnel')
     // // We start the tunnel, if there an arror we log it but we don't stop the server
@@ -28,18 +28,47 @@
 
     // const tunnel = localtunnel.tunnel
 
-    const discordBot= require('./src/modules/discord')
-    const clientBot = discordBot.clientBot
+    // --- Discord modules import ---
+    // const discordBot= require('./src/modules/discord') <---- Disabled temporarily
+    // const clientBot = discordBot.clientBot
 
 // --- End of local modules ---
+
 
 // --- Express configuration ---
     // We set up the view engine
     app.set('view engine', 'handlebars')
     // We set up the public folder
-    app.use(express.static('./express/src/public'))
+    app.use(express.static('./src/express/public'))
     // We use the views folder for the view files
     app.set('./src/express/views', 'views')
+    // We set up the handlebars engine
+    app.engine('handlebars', exphbs({
+        defaultLayout: 'main',
+        layoutsDir: './src/express/views/layouts',
+        partialsDir: './src/express/views/partials'
+    }))
+    // We set up the body parser
+    app.use(express.urlencoded({ extended: false }))
+    app.use(express.json())
+    // We set up the session
+    const session = require('express-session')
+    const pgSession = require('connect-pg-simple')(session)
+    app.use(session({
+        store: new pgSession({
+            pool: client,
+            tableName: 'session'
+        }),
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        }
+    }))
+    // we use our routes
+    app.use('/', require('./src/express/routes/mainRouter'))
+        
 // --- End of express configuration ---
 
 // ---( Express - Configuration )---
@@ -57,9 +86,6 @@
         console.log(`Server is running on port \x1b[33m${PORT}\x1b[0m`)
     })
     // We send "Hello World" to the client
-    app.get('/', (req, res) => {
-        res.send('Hello World')
-    })
     // When SIGINT is received we close nodejs
     process.on('SIGINT', () => {
         // We close the tunnel

@@ -34,7 +34,6 @@ const pg = require('pg')
 // --- End of database connection ---
 
 module.exports = { 
-    client : client,
     connect : connect,
     query : query,
     end : end
